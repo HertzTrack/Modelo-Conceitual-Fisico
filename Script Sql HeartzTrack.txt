@@ -1,0 +1,128 @@
+CREATE DATABASE heartztrack;
+USE heartztrack; 
+
+CREATE TABLE Usuario (
+id_usuario INT NOT NULL PRIMARY KEY,
+nome_usuario VARCHAR(15) NOT NULL,
+apelido VARCHAR(15) NULL DEFAULT NULL,
+email VARCHAR(45) NOT NULL,
+senha VARCHAR(45) NOT NULL,
+telefone INT NOT NULL,
+sobrenome VARCHAR(40) NOT NULL,
+CONSTRAINT email_UNIQUE UNIQUE(email)
+);
+
+CREATE TABLE Playlist (
+id_playlist INT NOT NULL,
+id_usuario INT NOT NULL,
+nome VARCHAR(50) NOT NULL,
+qntd_musica INT NULL DEFAULT NULL,
+PRIMARY KEY(id_playlist, id_usuario),
+CONSTRAINT fk_Playlist_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+CREATE INDEX fk_Playlist_Usuario1_idx ON Playlist(id_usuario);
+
+CREATE TABLE Cartao(
+numero INT NOT NULL,
+id_usuario INT NOT NULL,
+nome VARCHAR(20) NOT NULL,
+PRIMARY KEY(numero, id_usuario),
+CONSTRAINT fk_Cartao_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+CREATE INDEX fk_Cartao_Usuario1_idx ON Cartao(id_usuario);
+
+CREATE TABLE Artista (
+id_artista INT NOT NULL,
+verificacao TINYINT NOT NULL,
+nome_artistico VARCHAR(20) NOT NULL,
+data_inscricao DATE NOT NULL,
+cpf INT NOT NULL,
+PRIMARY KEY(id_artista)
+);
+
+CREATE TABLE Album (
+id_album INT NOT NULL ,
+id_artista INT NOT NULL,
+titulo VARCHAR(30) NOT NULL,
+qtd_musica VARCHAR(45) NOT NULL,
+data_lancamento DATE NOT NULL,
+duracao TIME NOT NULL,
+PRIMARY KEY(id_album),
+CONSTRAINT fk_Album_Artista FOREIGN KEY(id_artista) REFERENCES Artista(id_artista)
+);
+CREATE INDEX fk_Album_Artista_idx ON Album(id_artista);
+
+CREATE TABLE Musica (
+id_musica INT NOT NULL,
+id_album INT NOT NULL,
+nome VARCHAR(30) NOT NULL,
+duracao TIME NOT NULL,
+metronomo INT NULL DEFAULT NULL,
+letra_musica TEXT NULL DEFAULT NULL,
+views INT NULL DEFAULT NULL,
+download INT NULL DEFAULT NULL,
+data_lancamento DATE NOT NULL,
+PRIMARY KEY(id_musica, id_album),
+CONSTRAINT fk_Musica_Album FOREIGN KEY (id_album) REFERENCES Album(id_album)
+);
+CREATE INDEX fk_Musica_Album_idx ON Musica(id_album);
+
+CREATE TABLE Podcast (
+id_podcast INT NOT NULL,
+id_artista INT NOT NULL,
+tema VARCHAR(45) NOT NULL,
+titulo VARCHAR(50) NOT NULL,
+PRIMARY KEY(id_podcast, id_artista),
+CONSTRAINT fk_Podcast_Artista FOREIGN KEY(id_artista) REFERENCES Artista(id_artista)
+);
+CREATE INDEX fk_Podcast_Artista ON Podcast(id_artista);
+
+CREATE TABLE Tema (
+id_tema INT NOT NULL,
+id_podcast INT NOT NULL,
+nome_tema ENUM("..."),
+PRIMARY KEY(id_tema),
+CONSTRAINT fk_Tema_Podcast FOREIGN KEY(id_podcast) REFERENCES Podcast(id_podcast)
+);
+CREATE INDEX fk_Tema_Podcast_idx ON Tema(id_podcast);
+
+CREATE TABLE Playlist_Musica (
+id_playlist INT NOT NULL,
+id_usuario INT NOT NULL,
+id_musica INT NOT NULL,
+PRIMARY KEY(id_playlist, id_usuario, id_musica),
+CONSTRAINT fk_Playlist_Musica_Playlist FOREIGN KEY(id_playlist) REFERENCES Playlist(id_playlist),
+CONSTRAINT fk_Playlist_Musica_Usuario FOREIGN KEY(id_usuario) REFERENCES Usuario(id_usuario),
+CONSTRAINT fk_Playlist_Musica_Musica FOREIGN KEY(id_musica) REFERENCES Musica(id_musica)
+);
+CREATE INDEX fk_Playlist_Musica_Playlist_idx ON Playlist_Musica(id_playlist);
+CREATE INDEX fk_Playlist_Musica_Usuario_idx ON Playlist_Musica(id_usuario);
+CREATE INDEX fk_Playlist_Musica_Musica_idx ON Playlist_Musica(id_musica);
+
+CREATE TABLE Autoria (
+id_artista INT NOT NULL,
+id_musica INT NOT NULL,
+PRIMARY KEY(id_artista, id_musica),
+CONSTRAINT fk_Autoria_Playlist FOREIGN KEY(id_artista) REFERENCES Artista(id_artista),
+CONSTRAINT fk_Autoria_Musica FOREIGN KEY(id_musica) REFERENCES Musica(id_musica)
+);
+CREATE INDEX fk_Autoria_Playlist_idx ON Autoria(id_artista);
+CREATE INDEX fk_Autoria_Musica_idx ON Autoria(id_musica);
+
+CREATE TABLE Historico (
+id_usuario INT NOT NULL,
+id_musica INT NOT NULL,
+PRIMARY KEY(id_usuario, id_musica),
+CONSTRAINT fk_Historico_Usuario FOREIGN KEY(id_usuario) REFERENCES Usuario(id_usuario),
+CONSTRAINT fk_Historico_Musica FOREIGN KEY(id_musica) REFERENCES Musica(id_musica)
+);
+CREATE INDEX fk_Historico_Usuario_idx ON Historico(id_usuario);
+CREATE INDEX fk_Historico_Musica_idx ON Historico(id_musica);
+
+CREATE TABLE Visibilidade(
+tipo_visibilidade ENUM("...") NOT NULL,
+id_playlist INT NOT NULL,
+PRIMARY KEY(tipo_visibilidade, id_playlist),
+CONSTRAINT fk_Visibilidade_Playlist FOREIGN KEY(id_playlist) REFERENCES Playlist(id_playlist)
+);
+CREATE INDEX fk_Visibilidade_Playlist_idx ON Visibilidade(id_playlist);
